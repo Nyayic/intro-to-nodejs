@@ -26,3 +26,17 @@ registerSchema.pre('save', function(next){
     this.password=bcrypt.hashSync(this.password, 10); //salt
     next()
 })
+
+//authenticate
+registerSchema.statics.authenticate = async function(username, password){
+    const user = await this.finOne({username})
+    if(!user){
+        throw new Error('User not found')
+    }
+    const match = await bcrypt.compare(password, user.password)
+    if(match){
+        return user;
+    }
+}
+
+module.exports = mongoose.model('Register', registerSchema)
